@@ -69,7 +69,10 @@ type SendOptions struct {
 	// Sends the message silently. iOS users will not receive a notification, Android users will receive a notification with no sound.
 	DisableNotification bool
 
-	// ParseMode controls how client apps render your message.
+	// ParseMode controls how client apps render your message. When left as
+	// ModeDefault, the bot's Settings.ParseMode applies. To send one message
+	// without any parse mode on a bot that has one, pass ModeDefault as a
+	// separate option after the SendOptions: b.Send(to, text, opts, ModeDefault).
 	ParseMode ParseMode
 
 	// Entities is a list of special entities that appear in message text, which can be specified instead of parse_mode.
@@ -122,6 +125,10 @@ func (b *Bot) extractOptions(how []interface{}) *SendOptions {
 		switch opt := prop.(type) {
 		case *SendOptions:
 			opts = opt.copy()
+			if opts.ParseMode == ModeDefault {
+				// Inherit the bot's parse mode instead of silently dropping it.
+				opts.ParseMode = b.parseMode
+			}
 		case *ReplyMarkup:
 			if opt != nil {
 				opts.ReplyMarkup = opt.copy()
