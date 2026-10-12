@@ -1,7 +1,7 @@
 package react
 
 import (
-	tele "gopkg.in/telebot.v4"
+	tele "github.com/arshamalh/botbase"
 )
 
 type Reaction = tele.Reaction

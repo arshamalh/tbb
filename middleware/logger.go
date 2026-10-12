@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"log"
 
-	tele "gopkg.in/telebot.v4"
+	tele "github.com/arshamalh/botbase"
 )
 
 // Logger returns a middleware that logs incoming updates.

@@ -1,7 +1,7 @@
 package layout
 
 import (
-	tele "gopkg.in/telebot.v4"
+	tele "github.com/arshamalh/botbase"
 )
 
 // DefaultLayout is a simplified layout instance with pre-defined locale by default.

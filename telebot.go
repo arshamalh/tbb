@@ -6,7 +6,7 @@
 //
 //	import (
 //		"time"
-//		tele "gopkg.in/telebot.v4"
+//		tele "github.com/arshamalh/botbase"
 //	)
 //
 //	func main() {
@@ -24,7 +24,7 @@
 //
 //		b.Start()
 //	}
-package telebot
+package botbase
 
 import "errors"
 

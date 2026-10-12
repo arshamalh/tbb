@@ -1,4 +1,4 @@
-package telebot
+package botbase
 
 // ResultBase must be embedded into all IQRs.
 type ResultBase struct {

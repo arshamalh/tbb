@@ -1,4 +1,4 @@
-package telebot
+package botbase
 
 import (
 	"errors"
