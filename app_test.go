@@ -450,3 +450,18 @@ func TestNewWithDefaultSQLiteStore(t *testing.T) {
 	require.NoError(t, err)
 	assert.Contains(t, string(payload), `"amount":"5"`)
 }
+
+func TestDefaultCallbackSeesSplitData(t *testing.T) {
+	app, _ := newTestApp(t, nil)
+
+	var got Callback
+	app.DefaultCallback(func(c Ctx[flowState]) error {
+		got = *c.Callback()
+		return c.Respond()
+	})
+	app.Bot().ProcessUpdate(callbackUpdate("retired", "a|b"))
+
+	assert.Equal(t, "retired", got.Unique)
+	assert.Equal(t, "a|b", got.Data)
+	assert.Equal(t, "\fretired|a|b", got.RawData)
+}

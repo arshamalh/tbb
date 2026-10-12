@@ -21,8 +21,12 @@ func (a *App[T]) LanguageKeyboard() *ReplyMarkup {
 // language is set (and stored on the account), the button's spinner is
 // dismissed, then next runs, typically to show the main menu in the new
 // language. next may be nil.
-func (a *App[T]) OnLanguageSelected(next Handler[T]) {
-	a.Callback(LanguageBtn, func(c Ctx[T]) error {
+//
+// legacy lists older button keys whose payload is also a language code, so
+// language keyboards already sitting in chats keep working after a bot
+// switches to the built-in picker (e.g. Boteland's "setLang").
+func (a *App[T]) OnLanguageSelected(next Handler[T], legacy ...BtnKey) {
+	h := func(c Ctx[T]) error {
 		code := c.Callback().Data
 		if !a.i18n.Has(code) {
 			c.Logger().Warn("language picker: unknown language", "code", code)
@@ -38,5 +42,9 @@ func (a *App[T]) OnLanguageSelected(next Handler[T]) {
 			return nil
 		}
 		return next(c)
-	})
+	}
+	a.Callback(LanguageBtn, h)
+	for _, key := range legacy {
+		a.Callback(key, h)
+	}
 }

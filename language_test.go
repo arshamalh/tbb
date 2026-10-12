@@ -40,3 +40,17 @@ func TestLanguagePicker(t *testing.T) {
 	app.Bot().ProcessUpdate(callbackUpdate(LanguageBtn, "xx"))
 	assert.Equal(t, []string{"answerCallbackQuery"}, api.methods())
 }
+
+func TestLanguagePickerLegacyKeys(t *testing.T) {
+	app, _ := newTestApp(t, nil)
+
+	var picked []string
+	app.OnLanguageSelected(func(c Ctx[flowState]) error {
+		picked = append(picked, c.GetLanguage())
+		return nil
+	}, "setLang")
+
+	app.Bot().ProcessUpdate(callbackUpdate("setLang", "fa"))   // a keyboard sent before the migration
+	app.Bot().ProcessUpdate(callbackUpdate(LanguageBtn, "en")) // the built-in picker
+	assert.Equal(t, []string{"fa", "en"}, picked)
+}

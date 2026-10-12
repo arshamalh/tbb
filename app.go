@@ -171,7 +171,8 @@ func New[T any](cfg Config, opts ...AppOption[T]) (*App[T], error) {
 		return nil
 	}
 	a.defaultCallback = func(c Ctx[T]) error {
-		c.Logger().Warn("no handler for callback", "data", c.Callback().Data)
+		cb := c.Callback()
+		c.Logger().Warn("no handler for callback", "unique", cb.Unique, "data", cb.Data)
 		return c.Respond()
 	}
 	bot.Handle(OnText, a.wrap(a.routeText))
@@ -244,7 +245,10 @@ func (a *App[T]) Scene(scene Scene) *SceneRouter[T] {
 func (a *App[T]) DefaultText(h Handler[T]) { a.defaultText = h }
 
 // DefaultCallback handles button presses without a registered Callback.
-// By default the spinner is dismissed and a warning is logged.
+// By default the spinner is dismissed and a warning is logged. As for every
+// callback, button data is already split: Callback().Unique holds the
+// unregistered unique (empty for data not produced by a BtnKey), Data the
+// payload and RawData the original string.
 func (a *App[T]) DefaultCallback(h Handler[T]) { a.defaultCallback = h }
 
 // Handle registers a handler for any other telebot endpoint, such as
