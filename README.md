@@ -21,7 +21,10 @@ A Telegram bot framework for Go, distilled from years of production bots
 
 Everything from telebot is still there, in the same package: `Bot`,
 `Context`, `ReplyMarkup`, `OnDocument`… See [docs/telebot.md](docs/telebot.md)
-for the upstream guide.
+for the upstream guide. On top of upstream, the fork adds escaping helpers and
+located parse errors (tucnak/telebot#553), splits callback data for every
+handler, keeps the bot's parse mode in `SendOptions`, and adds
+`Bot.DownloadToWriter` (tucnak/telebot#704).
 
 ```bash
 go get github.com/arshamalh/botbase
@@ -105,6 +108,16 @@ app.Callback(TopUpAmount, func(c botbase.Ctx[State]) error {
 })
 ```
 
+Callback data has the form `"\f<unique>|<payload>"`. botbase splits it once,
+before any handler runs: `Callback().Unique` holds the key, `Data` the
+payload, `RawData` the original string. Unregistered buttons reach
+`DefaultCallback` already split, so there's never a reason to parse the data
+yourself. `ParseCallbackData` is exported if you need it outside a handler.
+
+When you rename or retire a button, keyboards already sent to users still
+carry the old unique. Register the old key too (`app.Callback(oldKey, h)`),
+or handle it in `DefaultCallback` by `Callback().Unique`.
+
 ### Sessions and scenes
 
 ```go
@@ -163,8 +176,37 @@ Missing keys fall back to the default language (`Config.DefaultLanguage`,
 
 With MarkdownV2 (the default parse mode), `GetL8d` keeps the template's own
 `*bold*`, `_italic_` and `` `code` `` and escapes everything else. Placeholder
-values are fully escaped, so user input is safe. `EscapeMarkdownV2` and
-`EscapeMarkdownV2Basics` are available for hand-built messages.
+values are fully escaped, so user input is safe.
+
+### Parse modes and escaping
+
+The bot sends with MarkdownV2 unless `WithSettings` changes `ParseMode`.
+Every message must then be valid MarkdownV2, so escape what you build by hand:
+
+| Where the text goes | Helper |
+|---|---|
+| plain text in any mode | `botbase.Escape(mode, s)` |
+| MarkdownV2 text | `EscapeMarkdownV2(s)` |
+| a MarkdownV2 template you wrote (keep `*bold*`, `_italic_`, `` `code` ``) | `EscapeMarkdownV2Basics(s)` |
+| inside `` `code` `` / ```` ```pre``` ```` | `EscapeMarkdownV2Code(s)` |
+| inside `[text](url)` | `EscapeMarkdownV2URL(s)` |
+| legacy Markdown / HTML | `EscapeMarkdown(s)` / `EscapeHTML(s)` |
+
+To send a single message as plain text: `c.Send(text, botbase.ModeDefault)`.
+A `&SendOptions{}` without `ParseMode` keeps the bot's mode; upstream telebot
+silently dropped it.
+
+When Telegram still rejects the markup, the error says where:
+
+```go
+_, err := c.Bot().Send(to, text)
+if errors.Is(err, botbase.ErrCantParseEntities) {
+	// telegram: can't parse entities: Can't find end of the entity starting
+	// at byte offset 7 near "Hi john▶_doe!" (400)
+	var pe *botbase.ParseEntitiesError
+	errors.As(err, &pe) // pe.Offset, pe.Text, pe.Excerpt()
+}
+```
 
 ### Clean keyboards
 
@@ -221,6 +263,7 @@ type Config struct {
 | `ctx.SetTopUpKind(k)` | `ctx.State().TopUpKind = k` |
 | `session.TelegramUD` + `GetUsersSessionData` | `app.Sessions()` (lazy load, write-through) |
 | `NewCallbacksHandler` / `cbsHandler.Register(btn, h)` | `app.Callback(btn, h)` |
+| `FindDataAndUnique(data)` | gone: `Callback().Unique` / `.Data` are already split (`botbase.ParseCallbackData` if needed elsewhere) |
 | `NewTextHandler` / `NewSceneTextHandler` | `app.Scene(s).On(q, h)` / `.Default(h)` |
 | `RegisterReplyKeyboardHandler(msgs.Cancel, h)` | `app.Reply("btn.cancel", h)` (localized) |
 | `btns.BtnKey` | `botbase.BtnKey` |
