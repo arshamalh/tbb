@@ -43,6 +43,7 @@ type API interface {
 	DeleteStickerSet(name string) error
 	DeleteTopic(chat *Chat, topic *Topic) error
 	Download(file *File, localFilename string) error
+	DownloadToWriter(file *File, w io.Writer) error
 	Edit(msg Editable, what interface{}, opts ...interface{}) (*Message, error)
 	EditCaption(msg Editable, caption string, opts ...interface{}) (*Message, error)
 	EditGeneralTopic(chat *Chat, topic *Topic) error

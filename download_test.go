@@ -56,3 +56,16 @@ func TestDownloadToWriterErrors(t *testing.T) {
 	err = b.DownloadToWriter(&File{FileID: "f1"}, failingWriter{})
 	assert.ErrorContains(t, err, "disk full")
 }
+
+// Handlers reach the bot through Context.Bot(), which returns the API
+// interface, so DownloadToWriter must be part of it.
+var _ API = (*Bot)(nil)
+
+func TestDownloadToWriterViaContext(t *testing.T) {
+	b := newDownloadTestBot(t, "zip-bytes", http.StatusOK)
+	c := b.NewContext(Update{})
+
+	var buf bytes.Buffer
+	require.NoError(t, c.Bot().DownloadToWriter(&File{FileID: "f1"}, &buf))
+	assert.Equal(t, "zip-bytes", buf.String())
+}
