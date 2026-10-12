@@ -68,7 +68,7 @@ func (b *Bot) Raw(method string, payload interface{}) ([]byte, error) {
 	}
 
 	// returning data as well
-	return data, extractOk(data)
+	return data, attachSentText(extractOk(data), payload)
 }
 
 func (b *Bot) sendFiles(method string, files map[string]File, params map[string]string) ([]byte, error) {
@@ -136,7 +136,7 @@ func (b *Bot) sendFiles(method string, files map[string]File, params map[string]
 		return nil, wrapError(err)
 	}
 
-	return data, extractOk(data)
+	return data, attachSentText(extractOk(data), params)
 }
 
 func addFileToWriter(writer *multipart.Writer, filename, field string, file interface{}) error {
@@ -300,6 +300,10 @@ func extractOk(data []byte) error {
 	}
 	if e.Ok {
 		return nil
+	}
+
+	if isParseEntitiesDescription(e.Description) {
+		return newParseEntitiesError(e.Description)
 	}
 
 	err := Err(e.Description)
