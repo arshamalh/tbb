@@ -3,7 +3,6 @@ package botbase
 import (
 	"context"
 	"errors"
-	"html"
 	"log/slog"
 	"strconv"
 	"strings"
@@ -228,12 +227,13 @@ func (a *App[T]) render(lang, key string, kv ...string) string {
 			out = strings.ReplaceAll(out, `\{`+kv[i]+`\}`, EscapeMarkdownV2(kv[i+1]))
 		}
 		return out
-	case ModeHTML:
+	case ModeHTML, ModeMarkdown:
+		// The template is authored markup; only the values are escaped.
 		escaped := make([]string, len(kv))
 		for i := range kv {
 			escaped[i] = kv[i]
 			if i%2 == 1 {
-				escaped[i] = html.EscapeString(kv[i])
+				escaped[i] = Escape(a.bot.parseMode, kv[i])
 			}
 		}
 		return Replace(template, escaped...)

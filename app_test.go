@@ -465,3 +465,9 @@ func TestDefaultCallbackSeesSplitData(t *testing.T) {
 	assert.Equal(t, "a|b", got.Data)
 	assert.Equal(t, "\fretired|a|b", got.RawData)
 }
+
+func TestRenderLegacyMarkdown(t *testing.T) {
+	app, _ := newTestApp(t, nil, WithSettings[flowState](func(s *Settings) { s.ParseMode = ModeMarkdown }))
+	app.I18n().Register("en", "", Translations{"hi": "*Hi* {name}."})
+	assert.Equal(t, `*Hi* john\_doe.`, app.render("en", "hi", "name", "john_doe"))
+}
