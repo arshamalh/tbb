@@ -1,5 +1,7 @@
 package botbase
 
+import "strings"
+
 // CallbackEndpoint is an interface any element capable
 // of responding to a callback `\f<unique>`.
 type CallbackEndpoint interface {
@@ -35,10 +37,47 @@ type Callback struct {
 	// that game. GameShortName may be empty
 	GameShortName string `json:"game_short_name"`
 
-	// Unique displays an unique of the button from which the
-	// callback was fired. Sets immediately before the handling,
-	// while the Data field stores only with payload.
+	// Unique is the unique of the button that fired the callback. When Data
+	// has the "\f<unique>|<payload>" form that buttons with a Unique produce,
+	// it is split before any handler runs (including OnCallback): Unique
+	// gets the unique, Data keeps only the payload and RawData the original.
+	// Otherwise Unique is empty and Data is left as Telegram sent it.
 	Unique string `json:"-"`
+
+	// RawData is the callback data exactly as received, before splitting.
+	RawData string `json:"-"`
+}
+
+// ParseCallbackData splits callback data produced by a button with a Unique
+// ("\f<unique>" or "\f<unique>|<payload>"). ok is false when data doesn't
+// start with "\f" or the unique is not made of letters, digits, '_' and '-'.
+// The payload is everything after the first '|', and may itself contain '|'
+// (use Context.Args to split it), be empty, or span several lines.
+func ParseCallbackData(data string) (unique, payload string, ok bool) {
+	if len(data) < 2 || data[0] != '\f' {
+		return "", "", false
+	}
+	rest := data[1:]
+	unique, payload, _ = strings.Cut(rest, "|")
+	if !validUnique(unique) {
+		return "", "", false
+	}
+	return unique, payload, true
+}
+
+func validUnique(s string) bool {
+	if s == "" {
+		return false
+	}
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		switch {
+		case c >= 'a' && c <= 'z', c >= 'A' && c <= 'Z', c >= '0' && c <= '9', c == '_', c == '-':
+		default:
+			return false
+		}
+	}
+	return true
 }
 
 // MessageSig satisfies Editable interface.

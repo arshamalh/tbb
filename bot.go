@@ -152,10 +152,7 @@ func (b *Bot) Use(middleware ...MiddlewareFunc) {
 	b.group.Use(middleware...)
 }
 
-var (
-	cmdRx   = regexp.MustCompile(`^(/\w+)(@(\w+))?(\s|$)(.+)?`)
-	cbackRx = regexp.MustCompile(`^\f([-\w]+)(\|(.+))?$`)
-)
+var cmdRx = regexp.MustCompile(`^(/\w+)(@(\w+))?(\s|$)(.+)?`)
 
 // Handle lets you set the handler for some command name or
 // one of the supported endpoints. It also applies middleware

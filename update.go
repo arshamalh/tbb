@@ -282,16 +282,20 @@ func (b *Bot) ProcessContext(c Context) {
 	}
 
 	if u.Callback != nil {
-		if data := u.Callback.Data; data != "" && data[0] == '\f' {
-			match := cbackRx.FindAllStringSubmatch(data, -1)
-			if match != nil {
-				unique, payload := match[0][1], match[0][3]
-				if handler, ok := b.handlers["\f"+unique]; ok {
-					u.Callback.Unique = unique
-					u.Callback.Data = payload
-					b.runHandler(handler, c)
-					return
-				}
+		cb := u.Callback
+		// Split before choosing a handler, so OnCallback sees the same shape
+		// as unique handlers do. Unique is only empty on the first pass; a
+		// re-processed update must not split its payload a second time.
+		if cb.Unique == "" {
+			cb.RawData = cb.Data
+			if unique, payload, ok := ParseCallbackData(cb.Data); ok {
+				cb.Unique, cb.Data = unique, payload
+			}
+		}
+		if cb.Unique != "" {
+			if handler, ok := b.handlers["\f"+cb.Unique]; ok {
+				b.runHandler(handler, c)
+				return
 			}
 		}
 
