@@ -37,3 +37,9 @@ terraform*
 .claude/
 CLAUDE.md
 AGENTS.md
+
+# SQLite databases created by botbase (default DSN)
+*.db
+*.db-shm
+*.db-wal
+.env
