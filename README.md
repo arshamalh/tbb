@@ -1,7 +1,9 @@
-<h1 align="center">tbb (TBotBase)</h1>
+<p align="center">
+  <img src="logo.png" alt="TBotBase: Golang Telegram Bot Library" width="560">
+</p>
 
 <p align="center">
-  <b>A batteries-included Telegram bot framework for Go.</b><br>
+  <b>tbb (TBotBase): a batteries-included Telegram bot framework for Go.</b><br>
   Sessions, scenes, i18n, persistence and clean keyboards, built on a fork of telebot v4.
 </p>
 
@@ -690,6 +692,7 @@ tbb/
 ├── middleware/         telebot middleware
 ├── react/              reaction helpers
 ├── examples/basic/     a complete example bot
+├── logo.png            project logo
 └── docs/telebot.md     upstream telebot guide
 ```
 
