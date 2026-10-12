@@ -6,12 +6,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.16
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
 
-    - name: Test
-      run: export TELEBOT_SECRET=${{ secrets.TELEBOT_SECRET }} && export CHAT_ID=${{ secrets.CHAT_ID }} && export USER_ID=${{ secrets.USER_ID }} && go test -v ./...
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        env:
+          TELEBOT_SECRET: ${{ secrets.TELEBOT_SECRET }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+          USER_ID: ${{ secrets.USER_ID }}
+        run: go test -race ./...

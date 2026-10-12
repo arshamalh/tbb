@@ -1,8 +1,0 @@
-article_message: This is an article.
-
-nested:
-  example: |-
-    This is {{ . }}.
-  another:
-    example: |-
-      This is {{ . }}.
