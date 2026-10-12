@@ -1,4 +1,4 @@
-<h1 align="center">botbase</h1>
+<h1 align="center">tbb (TBotBase)</h1>
 
 <p align="center">
   <b>A batteries-included Telegram bot framework for Go.</b><br>
@@ -6,8 +6,8 @@
 </p>
 
 <p align="center">
-  <a href="https://pkg.go.dev/github.com/arshamalh/botbase"><img src="https://pkg.go.dev/badge/github.com/arshamalh/botbase.svg" alt="Go Reference"></a>
-  <a href="https://github.com/arshamalh/botbase/actions/workflows/go.yml"><img src="https://github.com/arshamalh/botbase/actions/workflows/go.yml/badge.svg" alt="CI"></a>
+  <a href="https://pkg.go.dev/github.com/arshamalh/tbb"><img src="https://pkg.go.dev/badge/github.com/arshamalh/tbb.svg" alt="Go Reference"></a>
+  <a href="https://github.com/arshamalh/tbb/actions/workflows/go.yml"><img src="https://github.com/arshamalh/tbb/actions/workflows/go.yml/badge.svg" alt="CI"></a>
   <img src="https://img.shields.io/badge/go-%E2%89%A51.25-00ADD8?logo=go" alt="Go 1.25+">
   <img src="https://img.shields.io/badge/Bot%20API-10.1-26A5E4?logo=telegram" alt="Bot API 10.1">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT"></a>
@@ -20,20 +20,20 @@ them gets rewritten in every project: remembering where each user is in a
 conversation, translations, persisting state, keeping chats free of dead
 buttons, and escaping MarkdownV2 so Telegram doesn't reject the message.
 
-**botbase** is that layer, distilled from several production bots over the
+**tbb** (short for **TBotBase**) is that layer, distilled from several production bots over the
 years (most recently [Boteland](https://github.com/arshamalh/boteland)) and
 merged with a fork of [telebot v4](https://github.com/tucnak/telebot) into
 **one package**.
 
 ```go
-app, _ := botbase.New[State](cfg) // SQLite, sessions, i18n: ready
+app, _ := tbb.New[State](cfg) // SQLite, sessions, i18n: ready
 
-app.Callback(TopUp, func(c botbase.Ctx[State]) error {
+app.Callback(TopUp, func(c tbb.Ctx[State]) error {
 	c.Enter(SceneTopUp, AskAmount)                  // multi-step flow
 	return c.CleanEdit(c.GetL8d("topup.ask"), kb)   // localized, escaped, no stale buttons
 })
 
-app.Scene(SceneTopUp).On(AskAmount, func(c botbase.Ctx[State]) error {
+app.Scene(SceneTopUp).On(AskAmount, func(c tbb.Ctx[State]) error {
 	c.State().Amount = c.Text()                     // typed state, persisted automatically
 	c.ResetScene()
 	return c.SendL8d("topup.done")
@@ -86,7 +86,7 @@ app.Scene(SceneTopUp).On(AskAmount, func(c botbase.Ctx[State]) error {
 ## Install
 
 ```bash
-go get github.com/arshamalh/botbase
+go get github.com/arshamalh/tbb
 ```
 
 Requires **Go 1.25+**. No C toolchain is needed: SQLite is `modernc.org/sqlite`.
@@ -96,26 +96,26 @@ Requires **Go 1.25+**. No C toolchain is needed: SQLite is `modernc.org/sqlite`.
 ```go
 package main
 
-import "github.com/arshamalh/botbase"
+import "github.com/arshamalh/tbb"
 
 type State struct{} // your per-chat data; empty for now
 
 func main() {
-	var cfg botbase.Config
-	if err := botbase.LoadConfig(&cfg); err != nil { // reads TELEGRAM__TOKEN, .env, ...
+	var cfg tbb.Config
+	if err := tbb.LoadConfig(&cfg); err != nil { // reads TELEGRAM__TOKEN, .env, ...
 		panic(err)
 	}
 
-	app, err := botbase.New[State](cfg) // opens ./bot.db and migrates it
+	app, err := tbb.New[State](cfg) // opens ./bot.db and migrates it
 	if err != nil {
 		panic(err)
 	}
 
-	app.I18n().Register("en", "English 🇬🇧", botbase.Translations{
+	app.I18n().Register("en", "English 🇬🇧", tbb.Translations{
 		"hello": "Hi {name}! 👋",
 	})
 
-	app.Command("/start", func(c botbase.Ctx[State]) error {
+	app.Command("/start", func(c tbb.Ctx[State]) error {
 		return c.Send(c.GetL8d("hello", "name", c.Sender().FirstName))
 	})
 
@@ -150,22 +150,22 @@ type State struct {
 }
 
 const (
-	SceneFeedback botbase.Scene = iota + 1
+	SceneFeedback tbb.Scene = iota + 1
 )
 
 const (
-	AskRating botbase.Question = iota + 1
+	AskRating tbb.Question = iota + 1
 	AskComment
 )
 
-const BtnFeedback botbase.BtnKey = "feedback"
+const BtnFeedback tbb.BtnKey = "feedback"
 ```
 
 **2. Write translations.** One map per language; keys are yours.
 
 ```go
-var en = botbase.Translations{
-	botbase.LangNameKey: "English 🇬🇧",
+var en = tbb.Translations{
+	tbb.LangNameKey: "English 🇬🇧",
 	"menu":        "What would you like to do?",
 	"btn.feedback": "📝 Feedback",
 	"btn.cancel":  "Cancel ❌",
@@ -178,9 +178,9 @@ var en = botbase.Translations{
 **3. Wire the handlers.**
 
 ```go
-type Ctx = botbase.Ctx[State]
+type Ctx = tbb.Ctx[State]
 
-func register(app *botbase.App[State]) {
+func register(app *tbb.App[State]) {
 	app.I18n().Register("en", "", en)
 
 	app.Command("/start", menu)
@@ -215,7 +215,7 @@ func register(app *botbase.App[State]) {
 }
 
 func menu(c Ctx) error {
-	kb := &botbase.ReplyMarkup{}
+	kb := &tbb.ReplyMarkup{}
 	kb.Inline(BtnFeedback.AsRow(c.GetL8dBtn("btn.feedback")))
 	return c.CleanEdit(c.GetL8d("menu"), kb)
 }
@@ -265,7 +265,7 @@ For every update, the framework does the following around your handler:
 ### App and routing
 
 ```go
-app, err := botbase.New[State](cfg, opts...)
+app, err := tbb.New[State](cfg, opts...)
 ```
 
 `T` is your session state (use `struct{}` if you have none). Register handlers
@@ -281,7 +281,7 @@ with:
 | `app.Scene(s).Default(h)` | text in scene `s` at a question without its own handler |
 | `app.DefaultText(h)` | any other text |
 | `app.DefaultCallback(h)` | buttons without a registered `Callback` |
-| `app.Handle(botbase.OnDocument, h)` | any other telebot event: `OnPhoto`, `OnCheckout`, `OnPayment`, `OnLocation`, … |
+| `app.Handle(tbb.OnDocument, h)` | any other telebot event: `OnPhoto`, `OnCheckout`, `OnPayment`, `OnLocation`, … |
 | `app.OnLanguageSelected(h)` | the built-in language picker (see [Localization](#localization)) |
 | `app.Use(mw...)` | middleware around all of the above |
 
@@ -295,7 +295,7 @@ or "Main menu" button works from inside any flow.
 |---|---|
 | `WithLogger[T](*slog.Logger)` | logger (default `slog.Default()`) |
 | `WithI18n[T](*I18n)` | bring your own translation registry |
-| `WithDB[T](*bun.DB)` | share an existing database pool (botbase migrates its tables in it, never closes it) |
+| `WithDB[T](*bun.DB)` | share an existing database pool (tbb migrates its tables in it, never closes it) |
 | `WithStore[T](Store)` | replace persistence entirely, e.g. `NewMemoryStore()` in tests |
 | `WithSettings[T](func(*Settings))` | tweak telebot settings: poller, parse mode, HTTP client, `Synchronous`, `Offline`… |
 | `WithShutdownTimeout[T](d)` | how long `Run` waits for in-flight handlers (default 10s) |
@@ -323,17 +323,17 @@ Give every inline button a typed key and use it both to **build** and to
 **route**, so the two can't drift apart:
 
 ```go
-const TopUpAmount botbase.BtnKey = "tuAmt"
+const TopUpAmount tbb.BtnKey = "tuAmt"
 
-kb := &botbase.ReplyMarkup{}
+kb := &tbb.ReplyMarkup{}
 kb.Inline(
-	botbase.Row{
+	tbb.Row{
 		TopUpAmount.Build("$5", "ton", "500"),   // callback data: "\ftuAmt|ton|500"
 		TopUpAmount.Build("$10", "ton", "1000"),
 	},
 )
 
-app.Callback(TopUpAmount, func(c botbase.Ctx[State]) error {
+app.Callback(TopUpAmount, func(c tbb.Ctx[State]) error {
 	args := c.Args()            // ["ton", "500"]
 	_ = c.Callback().Unique     // "tuAmt"
 	_ = c.Callback().Data       // "ton|500"
@@ -401,7 +401,7 @@ app.I18n().Register("fa", "پارسی 🇮🇷", fa)
 | `c.SendL8d(key, opts...)` | sends `GetL8d(key)` |
 | `c.RespondL8d(key)` | answers a callback with a toast |
 | `app.I18n().Get(lang, key)` | raw template, for use outside handlers |
-| `botbase.Replace(tpl, "k", v)` | fills placeholders in any string |
+| `tbb.Replace(tpl, "k", v)` | fills placeholders in any string |
 
 **Fallback:** a missing key or language falls back to `Config.DefaultLanguage`
 (`"en"`), then renders as `[missing: key]`, so gaps are visible rather than
@@ -423,7 +423,7 @@ and an English user's "Cancel ❌" reach the same handler.
 ### Parse modes and escaping
 
 Bots send with **MarkdownV2** by default (change it with
-`WithSettings(func(s *Settings){ s.ParseMode = botbase.ModeHTML })`). In
+`WithSettings(func(s *Settings){ s.ParseMode = tbb.ModeHTML })`). In
 MarkdownV2, `_ * [ ] ( ) ~ \` > # + - = | { } . !` are all reserved. One
 unescaped `.` and Telegram rejects the whole message
 ([telebot#553](https://github.com/tucnak/telebot/issues/553)).
@@ -436,7 +436,7 @@ For hand-built text, pick the helper by **where the text goes**:
 
 | Context | Helper | Escapes |
 |---|---|---|
-| plain text, any mode | `botbase.Escape(mode, s)` | per mode |
+| plain text, any mode | `tbb.Escape(mode, s)` | per mode |
 | MarkdownV2 text | `EscapeMarkdownV2(s)` | every reserved char |
 | your own MarkdownV2 template | `EscapeMarkdownV2Basics(s)` | all but `* _ \`` |
 | inside `` `code` `` / ```` ```pre``` ```` | `EscapeMarkdownV2Code(s)` | only `` ` `` and `\` |
@@ -445,18 +445,18 @@ For hand-built text, pick the helper by **where the text goes**:
 | HTML | `EscapeHTML(s)` | `& < > "` |
 
 ```go
-msg := fmt.Sprintf("Login with `%s`", botbase.EscapeMarkdownV2Code(cmd))
-c.Send("Plain text, no formatting at all.", botbase.ModeDefault) // one message without parse mode
+msg := fmt.Sprintf("Login with `%s`", tbb.EscapeMarkdownV2Code(cmd))
+c.Send("Plain text, no formatting at all.", tbb.ModeDefault) // one message without parse mode
 ```
 
 **When Telegram still says no,** the error tells you where:
 
 ```go
 _, err := c.Bot().Send(to, text)
-if errors.Is(err, botbase.ErrCantParseEntities) {
+if errors.Is(err, tbb.ErrCantParseEntities) {
 	// telegram: can't parse entities: Can't find end of the entity starting
 	// at byte offset 7 near "Hi john▶_doe!" (400)
-	var pe *botbase.ParseEntitiesError
+	var pe *tbb.ParseEntitiesError
 	errors.As(err, &pe) // pe.Offset, pe.Text, pe.Excerpt()
 }
 ```
@@ -464,7 +464,7 @@ if errors.Is(err, botbase.ErrCantParseEntities) {
 ### Clean keyboards
 
 Menus built from inline keyboards quickly leave a trail of old messages whose
-buttons still look clickable. botbase remembers the last keyboard message per
+buttons still look clickable. tbb remembers the last keyboard message per
 chat (`Session.KeyboardMsgID`):
 
 | Call | Effect |
@@ -491,7 +491,7 @@ The framework owns three tables and migrates them on startup:
 |---|---|
 | `accounts` | one row per Telegram user: `id`, `telegram_id`, `username`, `first_name`, `last_name`, `language` |
 | `sessions` | one JSON document per chat |
-| `botbase_schema` | the framework's migration history (separate from yours) |
+| `tbb_schema` | the framework's migration history (separate from yours) |
 
 **Your own tables** live in the same database. Key them by `accounts.id`
 (`c.UserID()`), and migrate them with whatever tool you like:
@@ -514,19 +514,19 @@ anywhere, for example to look up the chat to notify from a background job.
 
 `LoadConfig(&cfg)` applies `default:"…"` tags, loads `.env` (real environment
 variables win), reads the environment with `__` as the nesting separator, and
-validates `validate:"…"` tags. Embed `botbase.Config` to inherit the
+validates `validate:"…"` tags. Embed `tbb.Config` to inherit the
 framework's keys next to yours:
 
 ```go
 type Config struct {
-	botbase.Config                                            // framework keys
+	tbb.Config                                            // framework keys
 	AdminID int64  `json:"admin_id" validate:"required"`     // ADMIN_ID
 	Wallet  string `json:"wallet"   default:"UQ…"`           // WALLET
 }
 
 var cfg Config
-if err := botbase.LoadConfig(&cfg); err != nil { log.Fatal(err) }
-app, _ := botbase.New[State](cfg.Config)
+if err := tbb.LoadConfig(&cfg); err != nil { log.Fatal(err) }
+app, _ := tbb.New[State](cfg.Config)
 ```
 
 | Variable | Default | |
@@ -543,9 +543,9 @@ app, _ := botbase.New[State](cfg.Config)
 Framework middleware sees the full `Ctx[T]`, session included:
 
 ```go
-func adminsOnly(ids ...int64) botbase.Middleware[State] {
-	return func(next botbase.Handler[State]) botbase.Handler[State] {
-		return func(c botbase.Ctx[State]) error {
+func adminsOnly(ids ...int64) tbb.Middleware[State] {
+	return func(next tbb.Handler[State]) tbb.Handler[State] {
+		return func(c tbb.Ctx[State]) error {
 			if !slices.Contains(ids, c.Sender().ID) {
 				return c.RespondL8d("error.forbidden")
 			}
@@ -557,7 +557,7 @@ func adminsOnly(ids ...int64) botbase.Middleware[State] {
 app.Use(adminsOnly(cfg.AdminID))
 ```
 
-telebot's middleware package (`github.com/arshamalh/botbase/middleware`:
+telebot's middleware package (`github.com/arshamalh/tbb/middleware`:
 `Logger`, `AutoRespond`, `Whitelist`, `Recover`, …) still works at the bot
 level via `app.Bot().Use(...)`.
 
@@ -566,24 +566,24 @@ level via `app.Bot().Use(...)`.
 Long polling is the default. For a webhook, swap the poller:
 
 ```go
-app, err := botbase.New[State](cfg, botbase.WithSettings[State](func(s *botbase.Settings) {
-	s.Poller = &botbase.Webhook{
+app, err := tbb.New[State](cfg, tbb.WithSettings[State](func(s *tbb.Settings) {
+	s.Poller = &tbb.Webhook{
 		Listen:   ":8443",
-		Endpoint: &botbase.WebhookEndpoint{PublicURL: "https://bot.example.com"},
+		Endpoint: &tbb.WebhookEndpoint{PublicURL: "https://bot.example.com"},
 	}
 }))
 ```
 
 `app.Start()` runs until SIGINT/SIGTERM; `app.Run(ctx)` until `ctx` is
 cancelled. Either way, shutdown stops polling, **waits for in-flight
-handlers** (up to `WithShutdownTimeout`), and closes the database if botbase
+handlers** (up to `WithShutdownTimeout`), and closes the database if tbb
 opened it. Sessions are written through as they change, so nothing needs
 flushing.
 
 ### Files
 
 ```go
-app.Handle(botbase.OnDocument, func(c botbase.Ctx[State]) error {
+app.Handle(tbb.OnDocument, func(c tbb.Ctx[State]) error {
 	doc := c.Message().Document
 	// Stream straight to S3/GCS/another service, no temp file:
 	return c.Bot().DownloadToWriter(&doc.File, uploader)
@@ -605,10 +605,10 @@ func TestStart(t *testing.T) {
 	}))
 	defer api.Close()
 
-	app, err := botbase.New[State](
-		botbase.Config{Telegram: botbase.TelegramConfig{Token: "test", URL: api.URL}},
-		botbase.WithStore[State](botbase.NewMemoryStore()),
-		botbase.WithSettings[State](func(s *botbase.Settings) {
+	app, err := tbb.New[State](
+		tbb.Config{Telegram: tbb.TelegramConfig{Token: "test", URL: api.URL}},
+		tbb.WithStore[State](tbb.NewMemoryStore()),
+		tbb.WithSettings[State](func(s *tbb.Settings) {
 			s.Offline = true     // skip getMe
 			s.Synchronous = true // ProcessUpdate returns after the handler
 		}),
@@ -616,18 +616,18 @@ func TestStart(t *testing.T) {
 	require.NoError(t, err)
 	register(app)
 
-	app.Bot().ProcessUpdate(botbase.Update{Message: &botbase.Message{
+	app.Bot().ProcessUpdate(tbb.Update{Message: &tbb.Message{
 		Text:   "/start",
-		Sender: &botbase.User{ID: 7},
-		Chat:   &botbase.Chat{ID: 7, Type: botbase.ChatPrivate},
+		Sender: &tbb.User{ID: 7},
+		Chat:   &tbb.Chat{ID: 7, Type: tbb.ChatPrivate},
 	}})
 
 	s, _ := app.Sessions().Get(context.Background(), 7)
-	assert.Equal(t, botbase.Scene(0), s.GetScene())
+	assert.Equal(t, tbb.Scene(0), s.GetScene())
 }
 ```
 
-botbase's own [`app_test.go`](app_test.go) has a fuller fake server that
+tbb's own [`app_test.go`](app_test.go) has a fuller fake server that
 records every call, which is useful as a template.
 
 ### Deployment
@@ -653,7 +653,7 @@ ENTRYPOINT ["/bot"]
 
 ## What the fork changes in telebot
 
-botbase vendors telebot v4 at upstream
+tbb vendors telebot v4 at upstream
 [`ee8708c`](https://github.com/tucnak/telebot/commit/ee8708c) (Bot API 10.1) as
 the root package. The upstream guide, with updated import paths, is in
 [docs/telebot.md](docs/telebot.md). Changes compared with upstream:
@@ -665,20 +665,20 @@ the root package. The upstream guide, with updated import paths, is in
 | Escaping helpers for all parse modes | none existed ([#553](https://github.com/tucnak/telebot/issues/553)) |
 | `&SendOptions{}` without `ParseMode` keeps the bot's mode | it silently dropped it, so escapes printed as backslashes |
 | `Bot.DownloadToWriter` | stream files without touching disk ([#704](https://github.com/tucnak/telebot/pull/704)) |
-| `layout` package removed | replaced by botbase's i18n and `BtnKey`; drops viper/yaml deps |
+| `layout` package removed | replaced by tbb's i18n and `BtnKey`; drops viper/yaml deps |
 | Go 1.25, CI with `-race` | generics, modern toolchain |
 
 ## Project layout
 
 ```
-botbase/
+tbb/
 ├── app.go              App[T], options, routing, the per-update wrapper, Run/Start
 ├── ctx.go              Ctx[T]: session access, i18n, Clean* helpers, rendering
 ├── session.go          Session[T], Scene, Question
 ├── session_store.go    write-through session cache + per-chat locks
 ├── store.go            Store interface, Account
 ├── sql_store.go        SQLite/Postgres store (bun), OpenDB
-├── migrate.go          framework migrations (botbase_schema)
+├── migrate.go          framework migrations (tbb_schema)
 ├── memory_store.go     in-memory Store for tests
 ├── i18n.go             translation registry, Replace
 ├── language.go         built-in language picker
@@ -701,7 +701,7 @@ between them. Owning the code let us fix things at the source (callback
 parsing, parse errors, `SendOptions`) instead of working around them.
 
 **Can I still use plain telebot handlers?**
-Yes: `app.Bot().Handle(endpoint, func(c botbase.Context) error {...})`. They
+Yes: `app.Bot().Handle(endpoint, func(c tbb.Context) error {...})`. They
 just don't get sessions. Prefer `app.Handle`, which does.
 
 **Do I have to use scenes?**
@@ -716,7 +716,7 @@ Yes. Changes made before the error are kept. A panic, however, skips the save.
 `GetL8dBtn` for labels.
 
 **Can I keep using my own migration tool?**
-Yes. The framework only touches `accounts`, `sessions` and `botbase_schema`.
+Yes. The framework only touches `accounts`, `sessions` and `tbb_schema`.
 
 **How do I upgrade the SQLite driver or bun?**
 `go get -u modernc.org/sqlite`. For bun, all `github.com/uptrace/bun/...`
@@ -739,7 +739,7 @@ go vet ./...
 go test -race ./...
 
 # Run the store tests against Postgres too:
-BOTBASE_TEST_POSTGRES_DSN=postgres://postgres:postgres@localhost:5432/botbase_test?sslmode=disable \
+TBB_TEST_POSTGRES_DSN=postgres://postgres:postgres@localhost:5432/tbb_test?sslmode=disable \
   go test -race -run 'SQLStore|SessionStoreOverSQL' .
 ```
 

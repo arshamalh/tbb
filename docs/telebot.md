@@ -1,9 +1,9 @@
-# Telebot (forked into botbase)
+# Telebot (forked into tbb)
 
-> botbase contains a fork of [telebot v4](https://github.com/tucnak/telebot)
+> tbb contains a fork of [telebot v4](https://github.com/tucnak/telebot)
 > (upstream commit `ee8708c`, MIT). This is the upstream guide with import
-> paths updated: every type and function below lives in the root `botbase`
-> package. The `layout` package is not included; botbase's i18n and `BtnKey`
+> paths updated: every type and function below lives in the root `tbb`
+> package. The `layout` package is not included; tbb's i18n and `BtnKey`
 > cover that ground. Badges and links still point at upstream.
 
 >"I never knew creating Telegram bots could be so _sexy_!"
@@ -14,7 +14,7 @@
 [![Discuss on Telegram](https://img.shields.io/badge/telegram-discuss-0088cc.svg)](https://t.me/go_telebot)
 
 ```bash
-go get -u github.com/arshamalh/botbase
+go get -u github.com/arshamalh/tbb
 ```
 
 * [Overview](#overview)
@@ -59,7 +59,7 @@ import (
 	"os"
 	"time"
 
-	tele "github.com/arshamalh/botbase"
+	tele "github.com/arshamalh/tbb"
 )
 
 func main() {
@@ -143,7 +143,7 @@ Telebot has a simple and recognizable way to set up middleware — chained funct
 Import a `middleware` package to get some basic out-of-box middleware
 implementations:
 ```go
-import "github.com/arshamalh/botbase/middleware"
+import "github.com/arshamalh/tbb/middleware"
 ```
 
 ```go

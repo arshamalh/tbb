@@ -1,4 +1,4 @@
-package botbase
+package tbb
 
 import (
 	"errors"
@@ -26,12 +26,12 @@ import (
 // double underscore and names are case-insensitive:
 //
 //	type Config struct {
-//		botbase.Config             // embedded: TELEGRAM__TOKEN, DB__DSN, ...
+//		tbb.Config             // embedded: TELEGRAM__TOKEN, DB__DSN, ...
 //		AdminID int64 `json:"admin_id"` // ADMIN_ID
 //	}
 //
 //	var cfg Config
-//	if err := botbase.LoadConfig(&cfg); err != nil { ... }
+//	if err := tbb.LoadConfig(&cfg); err != nil { ... }
 func LoadConfig(cfg any, envFiles ...string) error {
 	if len(envFiles) == 0 {
 		envFiles = []string{".env"}

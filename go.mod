@@ -1,4 +1,4 @@
-module github.com/arshamalh/botbase
+module github.com/arshamalh/tbb
 
 go 1.25.0
 

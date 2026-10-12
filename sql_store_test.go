@@ -1,4 +1,4 @@
-package botbase
+package tbb
 
 import (
 	"context"
@@ -10,12 +10,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// newTestSQLStore opens a migrated store. Set BOTBASE_TEST_POSTGRES_DSN to run
+// newTestSQLStore opens a migrated store. Set TBB_TEST_POSTGRES_DSN to run
 // the same tests against Postgres.
 func newTestSQLStore(t *testing.T) *SQLStore {
 	t.Helper()
 	cfg := DBConfig{DSN: "file:" + filepath.Join(t.TempDir(), "test.db") + "?_pragma=busy_timeout(5000)"}
-	if dsn := os.Getenv("BOTBASE_TEST_POSTGRES_DSN"); dsn != "" {
+	if dsn := os.Getenv("TBB_TEST_POSTGRES_DSN"); dsn != "" {
 		cfg = DBConfig{DSN: dsn}
 	}
 	db, err := OpenDB(cfg)

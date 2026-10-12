@@ -1,4 +1,4 @@
-package botbase
+package tbb
 
 import "strings"
 
@@ -6,7 +6,7 @@ import "strings"
 // constant per button and use it both to build keyboards and to register the
 // callback handler, so the two can never drift apart:
 //
-//	const Balance botbase.BtnKey = "balance"
+//	const Balance tbb.BtnKey = "balance"
 //
 //	kb.Inline(Balance.AsRow(ctx.GetL8dBtn("btn.balance")))
 //	app.Callback(Balance, h.Balance)

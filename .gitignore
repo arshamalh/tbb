@@ -38,7 +38,7 @@ terraform*
 CLAUDE.md
 AGENTS.md
 
-# SQLite databases created by botbase (default DSN)
+# SQLite databases created by tbb (default DSN)
 *.db
 *.db-shm
 *.db-wal

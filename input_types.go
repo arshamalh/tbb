@@ -1,4 +1,4 @@
-package botbase
+package tbb
 
 // InputMessageContent objects represent the content of a message to be sent
 // as a result of an inline query.

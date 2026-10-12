@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"log"
 
-	tele "github.com/arshamalh/botbase"
+	tele "github.com/arshamalh/tbb"
 )
 
 // Logger returns a middleware that logs incoming updates.

@@ -1,4 +1,4 @@
-package botbase
+package tbb
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 
 // ErrRecordNotFound is returned by a Store when a record does not exist.
 // (ErrNotFound is taken by the Telegram API error of the same name.)
-var ErrRecordNotFound = errors.New("botbase: not found")
+var ErrRecordNotFound = errors.New("tbb: not found")
 
 // Account is a Telegram user the bot has seen, stored in the "accounts"
 // table. The table is owned by the framework; apps that need more columns

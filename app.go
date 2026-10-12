@@ -1,4 +1,4 @@
-package botbase
+package tbb
 
 import (
 	"context"
@@ -322,7 +322,7 @@ func (a *App[T]) wrap(h Handler[T]) HandlerFunc {
 
 		defer func() {
 			if r := recover(); r != nil {
-				err = fmt.Errorf("botbase: handler panic: %v\n%s", r, debug.Stack())
+				err = fmt.Errorf("tbb: handler panic: %v\n%s", r, debug.Stack())
 			}
 		}()
 
@@ -433,7 +433,7 @@ func (a *App[T]) Run(ctx context.Context) error {
 	select {
 	case <-waited:
 	case <-time.After(a.shutdownTimeout):
-		err = errors.New("botbase: timed out waiting for handlers to finish")
+		err = errors.New("tbb: timed out waiting for handlers to finish")
 	}
 	return errors.Join(err, a.Close())
 }

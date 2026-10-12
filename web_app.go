@@ -1,4 +1,4 @@
-package botbase
+package tbb
 
 // WebApp represents a parameter of the inline keyboard button
 // or the keyboard button used to launch Web App.

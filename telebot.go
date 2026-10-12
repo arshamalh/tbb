@@ -6,7 +6,7 @@
 //
 //	import (
 //		"time"
-//		tele "github.com/arshamalh/botbase"
+//		tele "github.com/arshamalh/tbb"
 //	)
 //
 //	func main() {
@@ -24,7 +24,7 @@
 //
 //		b.Start()
 //	}
-package botbase
+package tbb
 
 import "errors"
 

@@ -1,8 +1,8 @@
-package botbase
+package tbb
 
 // LanguageBtn is the built-in button of the language picker. Its data is the
 // language code.
-const LanguageBtn BtnKey = "bbLang"
+const LanguageBtn BtnKey = "tbbLang"
 
 // LanguageKeyboard returns an inline keyboard with one button per registered
 // language, in registration order, labelled with the language's name.

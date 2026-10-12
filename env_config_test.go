@@ -1,4 +1,4 @@
-package botbase
+package tbb
 
 import (
 	"os"

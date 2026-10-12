@@ -1,4 +1,4 @@
-package botbase
+package tbb
 
 import (
 	"context"
@@ -21,7 +21,7 @@ type Migration struct {
 // It is separate from whatever migration tool the app uses for its own
 // tables.
 type schemaVersion struct {
-	bun.BaseModel `bun:"table:botbase_schema"`
+	bun.BaseModel `bun:"table:tbb_schema"`
 
 	Version   int       `bun:",pk"`
 	Name      string    `bun:",notnull"`

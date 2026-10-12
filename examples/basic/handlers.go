@@ -4,30 +4,30 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/arshamalh/botbase"
+	"github.com/arshamalh/tbb"
 )
 
-type Ctx = botbase.Ctx[State]
+type Ctx = tbb.Ctx[State]
 
 // Inline buttons.
 const (
-	btnFeedback botbase.BtnKey = "feedback"
-	btnProfile  botbase.BtnKey = "profile"
-	btnLanguage botbase.BtnKey = "language"
+	btnFeedback tbb.BtnKey = "feedback"
+	btnProfile  tbb.BtnKey = "profile"
+	btnLanguage tbb.BtnKey = "language"
 )
 
 // Scenes and their questions.
 const (
-	sceneFeedback botbase.Scene = iota + 1
+	sceneFeedback tbb.Scene = iota + 1
 )
 
 const (
-	qRating botbase.Question = iota + 1
+	qRating tbb.Question = iota + 1
 	qComment
 )
 
 type handlers struct {
-	app *botbase.App[State]
+	app *tbb.App[State]
 }
 
 func (h *handlers) register() {
@@ -50,11 +50,11 @@ func (h *handlers) register() {
 	h.app.DefaultText(h.mainMenu)
 }
 
-func mainMenuKeyboard(c Ctx) *botbase.ReplyMarkup {
-	kb := &botbase.ReplyMarkup{}
+func mainMenuKeyboard(c Ctx) *tbb.ReplyMarkup {
+	kb := &tbb.ReplyMarkup{}
 	kb.Inline(
 		btnFeedback.AsRow(c.GetL8dBtn(btnFeedbackText)),
-		botbase.Row{
+		tbb.Row{
 			btnProfile.Build(c.GetL8dBtn(btnProfileText)),
 			btnLanguage.Build(c.GetL8dBtn(btnLanguageText)),
 		},
@@ -62,9 +62,9 @@ func mainMenuKeyboard(c Ctx) *botbase.ReplyMarkup {
 	return kb
 }
 
-func cancelKeyboard(c Ctx) *botbase.ReplyMarkup {
-	kb := &botbase.ReplyMarkup{ResizeKeyboard: true}
-	kb.Reply(botbase.Row{kb.Text(c.GetL8dBtn(btnCancelText))})
+func cancelKeyboard(c Ctx) *tbb.ReplyMarkup {
+	kb := &tbb.ReplyMarkup{ResizeKeyboard: true}
+	kb.Reply(tbb.Row{kb.Text(c.GetL8dBtn(btnCancelText))})
 	return kb
 }
 
@@ -130,7 +130,7 @@ func (h *handlers) feedbackComment(c Ctx) error {
 
 	// A real bot would store the feedback in its own table via h.app.DB().
 	text := c.GetL8d(keyThanks, "rating", rating, "comment", c.Text())
-	if err := c.Send(text, &botbase.ReplyMarkup{RemoveKeyboard: true}); err != nil {
+	if err := c.Send(text, &tbb.ReplyMarkup{RemoveKeyboard: true}); err != nil {
 		return err
 	}
 	return h.mainMenu(c)
@@ -139,7 +139,7 @@ func (h *handlers) feedbackComment(c Ctx) error {
 func (h *handlers) cancel(c Ctx) error {
 	c.ResetScene()
 	c.State().Rating = ""
-	if err := c.SendL8d(keyCancelled, &botbase.ReplyMarkup{RemoveKeyboard: true}); err != nil {
+	if err := c.SendL8d(keyCancelled, &tbb.ReplyMarkup{RemoveKeyboard: true}); err != nil {
 		return err
 	}
 	return h.mainMenu(c)

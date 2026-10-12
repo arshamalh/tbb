@@ -1,4 +1,4 @@
-package botbase
+package tbb
 
 // Scene groups the steps of a multi-message conversation flow (a "wizard"),
 // such as "top up" or "deploy". Zero means "no scene": the user is at the
